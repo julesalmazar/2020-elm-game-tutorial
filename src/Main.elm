@@ -79,7 +79,7 @@ view model =
         , button [ onClick Increment ] [ text "+ 3" ]
         , button [ onClick Square ] [ text "^" ]
         , button
-            [ disabled False
+            [ disabled (not (UndoList.hasPast model))
             , onClick Undo
             ]
             [ text "Undo" ]
