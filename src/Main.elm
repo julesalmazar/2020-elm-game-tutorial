@@ -13,8 +13,10 @@ module Main exposing (..)
 --
 
 import Browser
-import Html exposing (Html, button, div, text)
+import Html exposing (Html, br, button, div, text)
+import Html.Attributes exposing (disabled)
 import Html.Events exposing (onClick)
+import UndoList exposing (UndoList)
 
 
 
@@ -30,12 +32,12 @@ main =
 
 
 type alias Model =
-    Int
+    UndoList Int
 
 
 init : Model
 init =
-    0
+    UndoList.fresh 0
 
 
 
@@ -46,19 +48,23 @@ type Msg
     = Increment
     | Decrement
     | Square
+    | Undo
 
 
 update : Msg -> Model -> Model
 update msg model =
     case msg of
         Increment ->
-            model + 3
+            UndoList.new (model.present + 3) model
 
         Decrement ->
-            model - 1
+            UndoList.new (model.present - 1) model
 
         Square ->
-            model ^ model
+            UndoList.new (model.present ^ 2) model
+
+        Undo ->
+            UndoList.undo model
 
 
 
@@ -68,8 +74,13 @@ update msg model =
 view : Model -> Html Msg
 view model =
     div []
-        [ div [] [ text (String.fromInt model) ]
-        , button [ onClick Decrement ] [ text "-" ]
-        , button [ onClick Increment ] [ text "+" ]
+        [ div [] [ text (String.fromInt model.present) ]
+        , button [ onClick Decrement ] [ text "- 1" ]
+        , button [ onClick Increment ] [ text "+ 3" ]
         , button [ onClick Square ] [ text "^" ]
+        , button
+            [ disabled False
+            , onClick Undo
+            ]
+            [ text "Undo" ]
         ]
